@@ -10,12 +10,12 @@ Parameters:
 
   DefaultVPC:
     Type: AWS::EC2::VPC::Id
-    Default: vpc-0da7e3cee77458803
+    Default: vpc-0aa43b998b6010b81
     Description: "Default VPC ID"
 
   DefaultSubnet:
     Type: AWS::EC2::Subnet::Id
-    Default: subnet-0b3f66f1258859cab
+    Default: subnet-0a9f77585755d21ba
     Description: "Default Subnet ID"
 
 Resources:
