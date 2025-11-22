@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Free-Tier Eligible: Create a simple S3 bucket"
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: "Name of the S3 bucket"
+    AllowedPattern: "^[a-z0-9.-]+$"
+    ConstraintDescription: "Bucket name must be lowercase letters, numbers, dots, or hyphens."
+
+Resources:
+  SimpleS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Suspended  # free-tier safe (versioning costs extra storage)
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: !Ref BucketName
+
+Outputs:
+  S3BucketName:
+    Description: "Name of the created S3 bucket"
+    Value: !Ref SimpleS3Bucket
+
+  S3BucketArn:
+    Description: "ARN of the created S3 bucket"
+    Value: !GetAtt SimpleS3Bucket.Arn
