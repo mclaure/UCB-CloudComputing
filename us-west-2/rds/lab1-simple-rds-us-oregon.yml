@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Simple Free-Tier RDS MySQL Instance (Default VPC + Default Subnets)
+
+Parameters:
+  DBUsername:
+    Type: String
+    Description: Master username for the RDS instance
+    MinLength: 1
+    MaxLength: 16
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Master user password
+    MinLength: 8
+    MaxLength: 41
+
+  DefaultVPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Select the Default VPC
+
+  DefaultSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select first default subnet
+
+  DefaultSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select second default subnet
+
+Resources:
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound MySQL traffic
+      VpcId: !Ref DefaultVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0  # For lab/testing only
+
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref DefaultSubnet1
+        - !Ref DefaultSubnet2
+
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: simple-mysql-instance
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      EngineVersion: "8.0"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      PubliclyAccessible: true
+      MultiAZ: false
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+
+Outputs:
+  RDSEndpoint:
+    Description: Endpoint of the RDS MySQL instance
+    Value: !GetAtt MyRDSInstance.Endpoint.Address
